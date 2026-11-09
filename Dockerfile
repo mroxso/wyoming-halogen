@@ -1,4 +1,4 @@
-FROM python:3.14-slim-trixie
+FROM python:3.15-slim-trixie
 WORKDIR /app
 COPY pyproject.toml README.md ./
 COPY wyoming_halogen ./wyoming_halogen
