@@ -37,9 +37,10 @@ Custom profiles use `--overrides profiles.json`, mapping exact IDs to `asr`, `tt
 
 ## Container and development
 
-Start with Docker Compose:
+Start with Docker Compose (copy `.env.example` to `.env` and edit as needed):
 
 ```sh
+cp .env.example .env
 HALOGEN_URL=http://halogen:8731/v1 docker compose up -d --build
 ```
 
