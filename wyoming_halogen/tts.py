@@ -3,10 +3,10 @@ from wyoming.audio import AudioStart, AudioChunk, AudioStop
 async def synthesize(h, event):
     d = event.data
     voice = d.get('voice') or {}
-    model = h.registry.select('tts',voice.get('name') or h.program)
+    model, selected_speaker = h.registry.resolve_voice(voice.get('name'), h.program)
     language = voice.get('language')
     if language and language not in model.languages: raise ValueError('Unsupported language')
-    speaker = voice.get('speaker') or h.config.default_voice or model.voices[0]
+    speaker = selected_speaker or voice.get('speaker') or h.config.default_voice or model.voices[0]
     if speaker not in model.voices: raise ValueError('Unsupported speaker')
     text = d['text']
     if not isinstance(text,str) or not 0 < len(text) <= h.config.max_text: raise ValueError('Text exceeds configured limit or is empty')

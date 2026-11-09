@@ -1,7 +1,6 @@
 import asyncio
 import logging
 import time
-from dataclasses import replace
 from .profiles import PROFILES, Profile
 
 class Registry:
@@ -37,11 +36,25 @@ class Registry:
         if len(models)!=1: raise ValueError('Select one available model with a configured default or explicit name')
         return models[0]
 
+    def resolve_voice(self, name=None, program=None):
+        # Voice IDs include the model so selection remains unambiguous.
+        for model in self.models:
+            if model.tts:
+                for speaker in model.voices:
+                    if name == f'{model.id}/{speaker}':
+                        return model, speaker
+        # Preserve the previous model-name + speaker protocol for existing clients.
+        return self.select('tts', name or program), None
+
     def info(self):
-        from wyoming.info import Info, Attribution, AsrProgram, AsrModel, TtsProgram, TtsVoice, TtsVoiceSpeaker
+        from wyoming.info import Info, Attribution, AsrProgram, AsrModel, TtsProgram, TtsVoice
         info = Info()
         for m in self.models:
             common = dict(name=m.id, attribution=Attribution('Halogen','https://github.com/peonist-ai/halogen-flash-server'), installed=True, description=m.provenance, version=None)
             if m.asr: info.asr.append(AsrProgram(**common,models=[AsrModel(**common,languages=list(m.languages))]))
-            if m.tts: info.tts.append(TtsProgram(**common,voices=[TtsVoice(**common,languages=list(m.languages),speakers=[TtsVoiceSpeaker(v) for v in m.voices])]))
+            if m.tts:
+                voices = [TtsVoice(**{**common, 'name': f'{m.id}/{speaker}',
+                                      'description': speaker.replace('_', ' ').title()},
+                                   languages=list(m.languages)) for speaker in m.voices]
+                info.tts.append(TtsProgram(**common, voices=voices))
         return info

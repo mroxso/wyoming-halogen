@@ -66,7 +66,7 @@ async def test_tts_forwards_language_and_speaker():
     async def write(event): events.append(event)
     model = PROFILES['LFM3-Audio-2B-fast']
     async with httpx.AsyncClient(transport=httpx.MockTransport(respond)) as http:
-        h = SimpleNamespace(registry=SimpleNamespace(select=lambda *args:model),
+        h = SimpleNamespace(registry=SimpleNamespace(resolve_voice=lambda *args:(model,None)),
             program=None, config=SimpleNamespace(default_voice=None,max_text=4096,max_bytes=1000),
             client=SimpleNamespace(http=http,base='http://halogen'),write_event=write)
         await synthesize(h,Event('synthesize',data={'text':'Guten Morgen.',
@@ -77,3 +77,35 @@ async def test_tts_forwards_language_and_speaker():
         with pytest.raises(ValueError,match='Unsupported language'):
             await synthesize(h,Event('synthesize',data={'text':'Hello','voice':{'language':'xx'}}))
         assert len(requests)==1
+
+@pytest.mark.asyncio
+async def test_home_assistant_voice_selection():
+    import httpx
+    import json
+    from wyoming.event import Event
+    from wyoming_halogen.tts import synthesize
+    c = Client()
+    c.models = [{'id': 'LFM3-Audio-2B-fast'}]
+    config = SimpleNamespace(profiles={}, stale_grace=0, default_tts=None,
+                             default_voice=None, max_text=4096, max_bytes=1000)
+    r = Registry(c, config)
+    await r.refresh()
+    voices = r.info().tts[0].voices
+    assert [v.description for v in voices] == ['Female', 'Male']
+    assert all(v.speakers is None for v in voices)
+    requests = []
+    def respond(request):
+        requests.append(json.loads(request.content))
+        return httpx.Response(200, content=b'\0\0')
+    async def write(event): pass
+    async with httpx.AsyncClient(transport=httpx.MockTransport(respond)) as http:
+        h = SimpleNamespace(registry=r, program=None, config=config,
+                            client=SimpleNamespace(http=http, base='http://halogen'),
+                            write_event=write)
+        for voice in voices:
+            await synthesize(h, Event('synthesize', data={'text':'Hallo',
+                'voice':{'name':voice.name, 'language':'de'}}))
+    assert [req['voice'] for req in requests] == ['female', 'male']
+    assert all(req['model'] == 'LFM3-Audio-2B-fast' for req in requests)
+    assert r.resolve_voice('LFM3-Audio-2B-fast')[1] is None
+    with pytest.raises(ValueError): r.resolve_voice('unknown/voice')
