@@ -56,3 +56,13 @@ pytest
 Live validation confirmed LFM3-Audio-2B-fast WAV output at 24 kHz, 16-bit mono, and retranscription of generated speech. Unit tests cover inventory filtering, outage expiry/recovery, selection and WAV conversion.
 
 Release validation still required: a real Home Assistant Assist pipeline, Qwen live coverage, inventory combinations on separate Halogen builds, disconnect/load stress tests, and WAV-response fallback. Current TTS requires the documented PCM response contract. No Home Assistant end-to-end validation is claimed.
+
+## Published container images
+
+GitHub Actions builds Linux AMD64 and ARM64 images and publishes them to `ghcr.io/mroxso/wyoming-halogen` using the repository's `GITHUB_TOKEN` (no additional registry secret needed). Pushes publish branch and `sha-…` tags; the default branch also publishes `latest`, and `v*` version tags publish semantic version tags. Pull requests build without publishing. The current feature branch uses the image tag `feat-wyoming-proxy`.
+
+```sh
+docker pull ghcr.io/mroxso/wyoming-halogen:feat-wyoming-proxy
+```
+
+For anonymous pulls, the GHCR package must have public visibility in its package settings. The first successful publishing workflow creates the package.
