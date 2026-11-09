@@ -9,6 +9,6 @@ dependencies = ["wyoming==1.11.0", "httpx==0.28.1"]
 [project.scripts]
 wyoming-halogen = "wyoming_halogen.__main__:main"
 [project.optional-dependencies]
-test = ["pytest==9.0.2", "pytest-asyncio==1.3.0"]
+test = ["pytest==9.0.3", "pytest-asyncio==1.3.0"]
 [tool.setuptools.packages.find]
 include = ["wyoming_halogen*"]
