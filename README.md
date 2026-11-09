@@ -61,10 +61,6 @@ Release validation still required: a real Home Assistant Assist pipeline, Qwen l
 
 ## Published container images
 
-GitHub Actions builds Linux AMD64 and ARM64 images and publishes them to `ghcr.io/mroxso/wyoming-halogen` using the repository's `GITHUB_TOKEN` (no additional registry secret needed). Pushes publish branch and `sha-…` tags; the default branch also publishes `latest`, and `v*` version tags publish semantic version tags. Pull requests build without publishing. The current feature branch uses the image tag `feat-wyoming-proxy`.
-
-```sh
-docker pull ghcr.io/mroxso/wyoming-halogen:feat-wyoming-proxy
-```
+GitHub Actions builds Linux AMD64 and ARM64 images and publishes them to `ghcr.io/mroxso/wyoming-halogen` using the repository's `GITHUB_TOKEN` (no additional registry secret needed). Only builds on `main` and tags publish images; pull requests and other branches build without publishing. Main publishes `main`, `sha-…`, and `latest` tags. Git tags publish `sha-…` tags, with `v*` semantic version tags also publishing semantic version image tags. See [container publishing](docs/container-publishing.md) for the CI policy.
 
 For anonymous pulls, the GHCR package must have public visibility in its package settings. The first successful publishing workflow creates the package.
