@@ -1,7 +1,8 @@
 services:
   wyoming-halogen:
     build: .
-    image: wyoming-halogen:local
+    # With no pull_policy, Compose pulls first and builds if the image is unavailable.
+    image: ghcr.io/mroxso/wyoming-halogen:latest
     restart: unless-stopped
     ports:
       - "${WYOMING_PORT:-10300}:10300"
