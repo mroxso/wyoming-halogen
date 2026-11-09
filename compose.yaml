@@ -1,0 +1,12 @@
+services:
+  wyoming-halogen:
+    build: .
+    image: wyoming-halogen:local
+    restart: unless-stopped
+    ports:
+      - "${WYOMING_PORT:-10300}:10300"
+    environment:
+      HALOGEN_URL: "${HALOGEN_URL:-http://host.docker.internal:8731/v1}"
+      HALOGEN_API_KEY: "${HALOGEN_API_KEY:-}"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

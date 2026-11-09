@@ -37,6 +37,14 @@ Custom profiles use `--overrides profiles.json`, mapping exact IDs to `asr`, `tt
 
 ## Container and development
 
+Start with Docker Compose:
+
+```sh
+HALOGEN_URL=http://halogen:8731/v1 docker compose up -d --build
+```
+
+By default, `compose.yaml` connects to Halogen on the Docker host using `host.docker.internal:8731` and publishes Wyoming on port 10300. Set `HALOGEN_URL` to your Halogen server URL, `WYOMING_PORT` to change the published port, and optionally `HALOGEN_API_KEY` for authentication. These variables can also be set in a local `.env` file. Use the Docker host's hostname and published port when adding the Home Assistant integration.
+
 ```sh
 docker build -t wyoming-halogen .
 docker run --rm -p 10300:10300 -e HALOGEN_URL=http://halogen:8731/v1 wyoming-halogen
