@@ -41,8 +41,10 @@ Start with Docker Compose (copy `.env.example` to `.env` and edit as needed):
 
 ```sh
 cp .env.example .env
-HALOGEN_URL=http://halogen:8731/v1 docker compose up -d --build
+HALOGEN_URL=http://halogen:8731/v1 docker compose up -d
 ```
+
+Compose first tries `ghcr.io/mroxso/wyoming-halogen:latest` and falls back to building from the local source if the image is unavailable. To explicitly build from source, run `docker compose up -d --build`.
 
 By default, `compose.yaml` connects to Halogen on the Docker host using `host.docker.internal:8731` and publishes Wyoming on port 10300. Set `HALOGEN_URL` to your Halogen server URL, `WYOMING_PORT` to change the published port, and optionally `HALOGEN_API_KEY` for authentication. These variables can also be set in a local `.env` file. Use the Docker host's hostname and published port when adding the Home Assistant integration.
 
