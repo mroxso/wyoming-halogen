@@ -12,6 +12,8 @@ async def synthesize(h, event):
     if not isinstance(text,str) or not 0 < len(text) <= h.config.max_text: raise ValueError('Text exceeds configured limit or is empty')
     if d.get('text_format','text') != 'text': raise ValueError('Only plain text is supported')
     body = dict(model=model.id,input=text,voice=speaker,response_format='pcm',stream=True)
+    if language:
+        body['language'] = language
     async with h.client.http.stream('POST',h.client.base+'/v1/audio/speech',json=body) as r:
         r.raise_for_status()
         await h.write_event(AudioStart(model.rate,2,1).event())
